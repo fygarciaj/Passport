@@ -75,7 +75,6 @@ class TokenGuard
      */
     public function __construct(ResourceServer $server,
                                 UserProvider $provider,
-                                // DatabaseUserProvider $databaseUserProvider,
                                 TokenRepository $tokens,
                                 ClientRepository $clients,
                                 Encrypter $encrypter)
@@ -85,7 +84,6 @@ class TokenGuard
         $this->clients = $clients;
         $this->provider = $provider;
         $this->encrypter = $encrypter;
-        // $this->databaseUserProvider = $databaseUserProvider;
     }
 
     /**
@@ -97,10 +95,15 @@ class TokenGuard
     public function user(Request $request)
     {
         if ($request->bearerToken()) {
-            if ($request->hasHeader('connection'))
+            if ($request->hasHeader('office'))
             {
-                Passport::setConnection($request->header('connection'));
+                Passport::setConnection($request->header('office'));
             }
+            else
+            {
+                Passport::setConnection(config('database.default'));
+            }
+            
             return $this->authenticateViaBearerToken($request);
         } elseif ($request->cookie(Passport::cookie())) {
             return $this->authenticateViaCookie($request);
